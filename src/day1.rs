@@ -6,7 +6,7 @@ use std::{
 const EXAMPLE_PATH: &'static str = "inputs/day-1/example.txt";
 const INPUT_PATH: &'static str = "inputs/day-1/input.txt";
 
-pub fn solve() {
+fn main() {
     println!("----- Day 1 -----");
     println!("Examples:");
     println!(
