@@ -14,7 +14,7 @@ fn main() {
         solve_part_1(EXAMPLE_PATH)
     );
     println!(
-        "- Part 2: Expected=???, Actual={}",
+        "- Part 2: Expected=3121910778619, Actual={}",
         solve_part_2(EXAMPLE_PATH)
     );
     println!();
@@ -73,7 +73,54 @@ fn solve_part_1(input_path: &str) -> u32 {
     total
 }
 
-fn solve_part_2(input_path: &str) -> u32 {
-    // TODO: Implement
-    0
+/// Finds the largest possible joltage from each bank when 12 batteries are enabled.
+///
+/// **Answer**: `171039099596062`
+fn solve_part_2(input_path: &str) -> u64 {
+    let input_lines = read_non_empty_lines(input_path);
+    let mut total = 0;
+
+    const BATTERY_COUNT: usize = 12;
+
+    for input_line in input_lines {
+        let digits = input_line
+            .chars()
+            .map(|c| c.to_digit(10).unwrap() as u64)
+            .collect::<Vec<_>>();
+
+        let n = digits.len();
+
+        let mut battery_joltage = 0;
+        let mut previous_idx: Option<usize> = None;
+
+        for i in (0..BATTERY_COUNT).rev() {
+            // If first selection, start at 0, otherwise prev + 1
+            // Then leave enough space at the end for subsequent batteries
+            let start_idx = previous_idx.map(|idx| idx + 1).unwrap_or(0);
+            let end_idx = n - i;
+
+            // Find lowest index of largest digit between [start, end]
+            let (idx, digit) = digits
+                .iter()
+                .enumerate()
+                .take(end_idx)
+                .skip(start_idx)
+                .min_by(|(idx1, digit1), (idx2, digit2)| {
+                    digit1.cmp(digit2).reverse().then(idx1.cmp(idx2))
+                })
+                .unwrap();
+
+            previous_idx = Some(idx);
+            battery_joltage = (battery_joltage * 10) + *digit;
+        }
+
+        // println!(
+        //     "{} -> {}",
+        //     input_line, battery_joltage
+        // );
+
+        total += battery_joltage;
+    }
+
+    total
 }
