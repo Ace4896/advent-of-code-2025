@@ -13,3 +13,4 @@ My solutions are written in Rust. Wanted to practice it as I haven't used it in 
 
 - I tried to solve everything in one pass without looking at hints/answers. If something seems super convoluted, it's probably because I missed something obvious and/or wasn't aware of the optimal algorithm
 - String manipulation in Rust is tricky as always
+- Ownership in nested structs, e.g. 2D vectors, is also tricky
