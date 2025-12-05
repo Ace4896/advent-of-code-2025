@@ -1,28 +1,25 @@
 use std::{
     collections::HashSet,
+    env,
     fs::File,
     io::{BufRead, BufReader},
+    process,
 };
-
-const EXAMPLE_PATH: &'static str = "inputs/day-2/example.txt";
-const INPUT_PATH: &'static str = "inputs/day-2/input.txt";
 
 fn main() {
     println!("----- Day 2 -----");
-    println!("Examples:");
-    println!(
-        "- Part 1: Expected=1227775554, Actual={}",
-        solve_part_1(EXAMPLE_PATH)
-    );
-    println!(
-        "- Part 2: Expected=4174379265, Actual={}",
-        solve_part_2(EXAMPLE_PATH)
-    );
-    println!();
-    println!("Final Answers:");
-    println!("- Part 1: Actual={}", solve_part_1(INPUT_PATH));
-    println!("- Part 2: Actual={}", solve_part_2(INPUT_PATH));
-    println!("-----------------");
+
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        eprintln!("No input file specified");
+        process::exit(1);
+    }
+
+    let input_path = &args[1];
+    println!("Input File: {}", input_path);
+
+    println!("Part 1: {}", solve_part_1(input_path));
+    println!("Part 2: {}", solve_part_2(input_path));
 }
 
 fn read_file_contents(path: &str) -> String {

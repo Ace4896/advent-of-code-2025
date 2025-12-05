@@ -7,7 +7,8 @@ This repository contains my personal solutions for Advent of Code 2025.
 My solutions are written in Rust. Wanted to practice it as I haven't used it in a while.
 
 - Install Rust Stable 1.91 or higher
-- Run `cargo run --bin dayX`, e.g. `day1` for the 1st day
+- Run `cargo run --bin dayX -- path/to/input.txt`
+  - e.g. `cargo run --bin day1 -- inputs/day1/input.txt` for the 1st day
 
 ## Notes
 

@@ -1,27 +1,24 @@
 use std::{
+    env,
     fs::File,
     io::{BufRead, BufReader},
+    process,
 };
-
-const EXAMPLE_PATH: &'static str = "inputs/day-3/example.txt";
-const INPUT_PATH: &'static str = "inputs/day-3/input.txt";
 
 fn main() {
     println!("----- Day 3 -----");
-    println!("Examples:");
-    println!(
-        "- Part 1: Expected=357, Actual={}",
-        solve_part_1(EXAMPLE_PATH)
-    );
-    println!(
-        "- Part 2: Expected=3121910778619, Actual={}",
-        solve_part_2(EXAMPLE_PATH)
-    );
-    println!();
-    println!("Final Answers:");
-    println!("- Part 1: Actual={}", solve_part_1(INPUT_PATH));
-    println!("- Part 2: Actual={}", solve_part_2(INPUT_PATH));
-    println!("-----------------");
+
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        eprintln!("No input file specified");
+        process::exit(1);
+    }
+
+    let input_path = &args[1];
+    println!("Input File: {}", input_path);
+
+    println!("Part 1: {}", solve_part_1(input_path));
+    println!("Part 2: {}", solve_part_2(input_path));
 }
 
 fn read_non_empty_lines(path: &str) -> impl Iterator<Item = String> {
