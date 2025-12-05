@@ -1,7 +1,6 @@
 use std::{
-    collections::BTreeMap,
     env,
-    fs::{File, read},
+    fs::File,
     io::{BufRead, BufReader},
     ops::RangeInclusive,
     process,
@@ -20,54 +19,39 @@ fn main() {
     println!("Input File: {}", input_path);
 
     println!("Part 1: {}", solve_part_1(input_path));
+    println!("Part 2: {}", solve_part_2(input_path));
 }
 
 #[derive(Default)]
 struct Database {
-    /// Ingredient ID ranges, indexed by start of each range
-    id_ranges: BTreeMap<u64, RangeInclusive<u64>>,
-    id_ranges_2: Vec<RangeInclusive<u64>>
+    // NOTE: For better efficiency, could index by the start of the range
+    //       This would reduce how many entries we need to search through
+    id_ranges: Vec<RangeInclusive<u64>>,
 }
 
 impl Database {
     pub fn add_id_range(&mut self, id_range: RangeInclusive<u64>) {
-        self.id_ranges_2.push(id_range);
+        // Remove any ranges that overlap with the input range
+        let overlapping_ranges = self.id_ranges.extract_if(.., |current_range| {
+            current_range.contains(id_range.end())
+                || current_range.contains(id_range.end())
+                || id_range.contains(current_range.start())
+                || id_range.contains(current_range.end())
+        });
 
-        // TODO: Merge ID ranges that overlap
-        // let mut merged_start = *id_range.start();
-        // let mut merged_end = *id_range.end();
-        // loop {
+        // Then merge with the input range
+        let merged_range = overlapping_ranges.fold(id_range.clone(), |acc, x| {
+            let merged_start = *acc.start().min(x.start());
+            let merged_end = *acc.end().max(x.end());
 
-        // }
+            merged_start..=merged_end
+        });
 
-        // let start = *id_range.start();
-        // let end = *id_range.end();
-        // if let Some((&nearest_start, nearest_range)) =
-        //     self.id_ranges.range(..=id_range.start()).next_back()
-        // {
-        //     // Find other ranges that overlap
-        //     let
-
-        //     let merged_start = start.min(nearest_start);
-        //     let merged_end = end.max(*nearest_range.end());
-        //     let merged_range = merged_start..=merged_end;
-
-        //     self.id_ranges.remove(&nearest_start);
-        //     self.id_ranges.insert(merged_start, merged_range);
-        // } else {
-        //     self.id_ranges.insert(start, id_range);
-        // }
+        self.id_ranges.push(merged_range);
     }
 
     pub fn contains_id(&self, id: u64) -> bool {
-        // Find entry whose key matches or is just lower than this ID
-        // self.id_ranges
-        //     .range(..=id)
-        //     .next_back()
-        //     .map(|(_, nearest_range)| nearest_range.contains(&id))
-        //     .unwrap_or(false)
-
-        self.id_ranges_2.iter().any(|id_range| id_range.contains(&id))
+        self.id_ranges.iter().any(|id_range| id_range.contains(&id))
     }
 }
 
@@ -96,7 +80,9 @@ fn parse_input(input_path: &str) -> (Database, Vec<u64>) {
     }
 
     // Parse available IDs
-    let available_ids = input_iter.filter_map(|l| l.trim().parse::<u64>().ok()).collect();
+    let available_ids = input_iter
+        .filter_map(|l| l.trim().parse::<u64>().ok())
+        .collect();
 
     (database, available_ids)
 }
@@ -107,7 +93,22 @@ fn parse_input(input_path: &str) -> (Database, Vec<u64>) {
 fn solve_part_1(input_path: &str) -> usize {
     let (database, available_ids) = parse_input(input_path);
 
-    available_ids.iter()
+    available_ids
+        .iter()
         .filter(|id| database.contains_id(**id))
         .count()
+}
+
+/// Finds how many IDs in the database are fresh.
+///
+/// **Answer**: `366181852921027`
+fn solve_part_2(input_path: &str) -> u64 {
+    let (database, _) = parse_input(input_path);
+
+    // Overlapping ID ranges are merged during parsing, so we can just sum the differences
+    database
+        .id_ranges
+        .iter()
+        .map(|r| *r.end() - *r.start() + 1)
+        .sum()
 }
